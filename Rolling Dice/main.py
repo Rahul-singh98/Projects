@@ -3,12 +3,12 @@ from PIL import ImageTk , Image
 import random 
 
 root = Tk()
-root.geometry('350x350')
+root.geometry('200x200')
 root.title('Rolling Dice')
 
-dice = ['./Dice_Images/Dice1.jpeg','./Dice_Images/Dice2.jpeg',
-        './Dice_Images/Dice3.jpeg','./Dice_Images/Dice4.jpeg',
-        './Dice_Images/Dice5.jpeg','./Dice_Images/Dice6.jpeg']
+dice = ['./Dice_Images/Dice1.png','./Dice_Images/Dice2.png',
+        './Dice_Images/Dice3.png','./Dice_Images/Dice4.png',
+        './Dice_Images/Dice5.png','./Dice_Images/Dice6.png']
 
 image = ImageTk.PhotoImage(Image.open(random.choice(dice)))
 
