@@ -13,6 +13,7 @@ class Question(TextPhotoBasedEntity):
         self._answers = None
 
         super().__init__(id, askingMember, text, photos)
+        self.updateText(text)
         self._status = Status.OPEN
         self._title = title
         self._bounty = bounty
@@ -32,6 +33,7 @@ class Question(TextPhotoBasedEntity):
     def addAnswer(self, newAnswer):
         self._answers.append(newAnswer)
 
+    @property
     def getTitle(self):
         return self._title
 
@@ -41,14 +43,21 @@ class Question(TextPhotoBasedEntity):
     def getBounty(self):
         return self._bounty
 
+    @property
     def getTags(self):
         return self._tags
 
+    @property
     def getComments(self):
         return self._comments
 
+    @property
     def getAnswers(self):
         return self._answers
+
+    @property
+    def getAnswersCount(self):
+        return len(self._answers)
 
 
 class Answer(TextPhotoBasedEntity):

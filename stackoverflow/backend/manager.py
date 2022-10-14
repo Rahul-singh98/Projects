@@ -69,6 +69,7 @@ class Member:
     def getStatus(self):
         return self._accountStatus
 
+    @property
     def getName(self):
         return self._name
 

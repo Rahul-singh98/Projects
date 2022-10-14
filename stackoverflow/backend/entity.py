@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from .constants import Status
 
 
@@ -62,11 +63,13 @@ class TextPhotoBasedEntity:
         self.photos.extend(newPhotosToBeAdded)
         self.lastUpdated = round(time.time() * 1000)
 
+    @property
     def getUpvoteCount(self):
-        return self.membersWhoUpvotedThisEntity.size()
+        return len(self.membersWhoUpvotedThisEntity)
 
+    @property
     def getDownvoteCount(self):
-        return self.membersWhoDownvotedThisEntity.size()
+        return len(self.membersWhoDownvotedThisEntity)
 
     def getCreator(self):
         return self.creator
@@ -77,12 +80,19 @@ class TextPhotoBasedEntity:
     def getId(self):
         return self.id
 
+    @property
     def getText(self):
         return self.text
 
+    @property
+    def getCreator(self):
+        return self.creator
+
+    @property
     def getCreationDateTime(self):
         return self.creationDateTime
 
+    @property
     def getLastUpdated(self):
         return self.lastUpdated
 
@@ -95,11 +105,45 @@ class TextPhotoBasedEntity:
     def getMembersWhoUpvotedThisEntity(self):
         return self.membersWhoUpvotedThisEntity
 
+    @property
     def getVoteCount(self):
-        return self.getUpvoteCount() - self.getDownvoteCount()
+        return self.getUpvoteCount - self.getDownvoteCount
 
     def getNumberOfUsersReportedThisEntity(self):
         return self.numberOfUsersReportedThisEntity
 
     def getStatus(self):
         return self.status
+
+    @property
+    def pretty_date(self):
+        now = datetime.now()
+        diff = now - datetime.fromtimestamp(self.lastUpdated//1000)
+        seconds = diff.seconds
+        days = diff.days
+
+        if days < 0:
+            return ""
+
+        if days == 0:
+            if seconds < 0:
+                return "just now"
+            if seconds < 60:
+                return str(seconds) + " seconds ago"
+            if seconds < 120:
+                return "a minute ago"
+            if seconds < 3600:
+                return str(seconds // 60) + " minutes ago"
+            if seconds < 7200:
+                return "an hour ago"
+            if seconds < 86400:
+                return str(seconds // 3600) + " hours ago"
+        if days == 1:
+            return "Yesterday"
+        if days < 7:
+            return str(days) + " days ago"
+        if days < 31:
+            return str(days // 7) + " weeks ago"
+        if days < 365:
+            return str(days // 30) + " months ago"
+        return str(days // 365) + " years ago"

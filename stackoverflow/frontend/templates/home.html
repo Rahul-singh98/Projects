@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container">
+    <ul>
+        {% for ques in questions %}
+        <li>
+            <div class="row">
+                <div class="col-1"><small>{{ ques.getVoteCount }} votes</small></div>
+                <div class="col-1"><small>{{ ques.getAnswersCount }} ans</small></div>
+            </div>
+            <div class="row text-primary ">
+                <div class="col-xl-1"><h4>{{ ques.getTitle }}</h4></div>
+            </div>
+            <div class="row">
+                <div class="col">{{ ques.getText }}</div>
+            </div>
+            <div class="row">
+                <div class="col-6">
+                    <ul>
+                        {% for tag in ques.getTags %}
+                            <li>{{ tag }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-2 text-primary">
+                    <button type="button" class="btn btn-outline-primary">
+                        {{ ques.getCreator.getName }}
+                    </button>
+                </div>
+                <div class="col-3"><small>{{ ques.pretty_date }} </small></div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
