@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container col-10 col-md-4 py-5 mt-5 px-4 rounded-4" style="background: #f1f1f1;">
+    <h3 class="text-center">Login</h3><br>
+    <form action="#">
+        <div class="form-group">
+            <label for="email">Email</label><br>
+            <input type="email" class="form-control" id="email" name="email" required><br>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label><br>
+            <input type="password" class="form-control" id="password" name="password" required><br>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-primary" value="Submit" id="submit-btn" name="submit-btn">
+            <a href="{% url 'signup' %}" class="ms-3">SignUp</a>
+        </div>
+    </form>
+    <hr>
+    <ul>
+        <li><a href="#">Forgot Password</a></li>
+        <li><a href="#">Forgot Username</a></li>
+        <li><a href="#">Resend activation code</a></li>
+    </ul>
+</div>    
+
+{% endblock %}

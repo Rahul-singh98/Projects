@@ -45,7 +45,8 @@ class Question(TextPhotoBasedEntity):
 
     @property
     def getTags(self):
-        return self._tags
+        tags = [tag.getText for tag in self._tags]
+        return tags
 
     @property
     def getComments(self):

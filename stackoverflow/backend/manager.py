@@ -57,15 +57,19 @@ class Member:
             receiver.receiveBounty(bountyReputation)
         return False
 
+    @property
     def receiveBounty(self, bountyReputation):
         self._reputation += bountyReputation
 
+    @property
     def getReputation(self):
         return self._reputation
 
+    @property
     def getId(self):
         return self._id
 
+    @property
     def getStatus(self):
         return self._accountStatus
 
@@ -73,9 +77,11 @@ class Member:
     def getName(self):
         return self._name
 
+    @property
     def getDisplayName(self):
         return self._displayName
 
+    @property
     def getEmail(self):
         return self._email
 

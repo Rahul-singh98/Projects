@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container">
+    <table class="table table-bordered mt-5">
+        <tr scope="row">
+            <td>User Name</td>
+            <td>{{ user.getDisplayName }}</td>
+        </tr>
+        <tr scope="row">
+            <td>Name</td>
+            <td>{{ user.getName }}</td>
+        </tr>
+        <tr scope="row">
+            <td>Email</td>
+            <td>{{ user.getEmail }}</td>
+        </tr>
+        <tr scope="row">
+            <td>Status</td>
+            <td>{{ user.getStatus.name }}</td>
+        </tr>
+        <tr scope="row">
+            <td>Reputation</td>
+            <td>{{ user.getReputation }}</td>
+        </tr>    
+    </table>
+</div>
+{% endblock %}

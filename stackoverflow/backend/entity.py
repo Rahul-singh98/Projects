@@ -77,6 +77,7 @@ class TextPhotoBasedEntity:
     def delete(self):
         self.status = Status.DELETED
 
+    @property
     def getId(self):
         return self.id
 

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block main %}
 <div class="container">
+    <button type="submit" class="btn btn-outline-primary"><a href="/ask" class="text-decoration-none">Ask Question</a></button><br><br>
     <ul>
         {% for ques in questions %}
         <li>
@@ -9,22 +10,22 @@
                 <div class="col-1"><small>{{ ques.getAnswersCount }} ans</small></div>
             </div>
             <div class="row text-primary ">
-                <div class="col-xl-1"><h4>{{ ques.getTitle }}</h4></div>
+                <div class="col-12"><h4><a href="{% url 'question' ques.getId %}" class="text-decoration-none">{{ ques.getTitle }}</a></h4></div>
             </div>
             <div class="row">
-                <div class="col">{{ ques.getText }}</div>
+                <div class="col-12">{{ ques.getText }}</div>
             </div>
             <div class="row">
                 <div class="col-6">
                     <ul>
                         {% for tag in ques.getTags %}
-                            <li>{{ tag }}</li>
+                            <li class="btn btn-outline-primary p-1">{{ tag }}</li>
                         {% endfor %}
                     </ul>
                 </div>
                 <div class="col-2 text-primary">
                     <button type="button" class="btn btn-outline-primary">
-                        {{ ques.getCreator.getName }}
+                        <a href="{% url 'profile' ques.getCreator.getId %}" class="text-decoration-none">{{ ques.getCreator.getName }}</a>
                     </button>
                 </div>
                 <div class="col-3"><small>{{ ques.pretty_date }} </small></div>
