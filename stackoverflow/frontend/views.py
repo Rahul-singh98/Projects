@@ -1,4 +1,7 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password, check_password
+from backend.models import RegisteredMemberModel
 from backend.manager import RegisteredMember
 from backend.ood import Question
 from backend.utility import Tag
@@ -22,18 +25,18 @@ question2 = Question(2, member2, "Who is Frontend expert with django\
 
 def home(request):
     global question1, question2
-    print("Search ->",request.GET.get('search'))
-    if request.GET.get('search'):
-        context = {
-        "questions": [question1]
-        }
-    else:
-        context = {
-            "questions": [question1, question2]
-        }
+    # if request.GET.get('search'):
+    #     context = {
+    #     "questions": [question1]
+    #     }
+    # else:
+    context = {
+        "questions": [question1, question2]
+    }
     return render(request, 'home.html', context)
 
 def ask(request):
+
     if not request.user.is_authenticated:
         return redirect('login')
     return render(request, 'ask_question.html')
@@ -58,26 +61,40 @@ def user_profile(request, user_id: int):
     return render(request, 'profile.html', context)
 
 def login(request):
+    if request.method == "POST":
+        username = request.POST.get('user_name')
+        password = request.POST.get('password')
+        print(username, password)
+        user = authenticate(request, username=username, password=password)
+
+        print("User => ", user)
+        if user is None:
+            return redirect('login')
+        return render(request, 'home.html', {'user':user})
     return render(request, 'login.html')
 
 def signup(request):
     if request.method == "POST":
+        user_name = request.POST.get('user_name')
         f_name = request.POST.get('full_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # cipher = make_password(password)
+        cipher = make_password(password)
 
-        # userObj = models.User(full_name=f_name, 
-        #                         email=email, 
-        #                         password=cipher)
-        # userObj.save()
+        user = RegisteredMemberModel(
+            user_name = user_name,
+            name = f_name,
+            email = email,
+            password = cipher
+        )
 
-        # user = models.User.objects.get(email=email)
-        # context = {
-        #     'username':user.full_name
-        # }
-        # return render(request, 'home.html', context)
+        try:
+            user.save()
+            authenticate(request, username=user_name, password=cipher)
+            return render(request, 'home.html')
+        except Exception as e:
+            print(e)
 
 
-    return render(request, 'create_account.html')
+    return render(request, 'signup.html')

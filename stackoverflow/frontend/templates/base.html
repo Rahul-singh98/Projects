@@ -16,14 +16,19 @@
         <a href="" class="navbar-brand mr-auto p-2">Stack Overflow</a>
         <div class="p-2">
             <form action="{% url 'home' %}" class="form-outline">
-                <input type="search" class="form-control mr-sm-2" placeholder="Search Question" aria-label="Search" name="search">
+                <input type="search" class="mr-sm-2" placeholder="Search Question" aria-label="Search" name="search">
                 <button type="button" class="btn btn-outline-success my-2 my-sm-0">Search</button>
             </form>
         </div>
+        {% if user.is_authenticated %}
+            <button type="button" class="btn btn-outline-primary"><a href="{% url 'login' %}" class="text-decoration-none">Logout</a></button>
+            <p>{{ user }}</p>
+        {% else %}
         <div class="p-2">
             <button type="button" class="btn btn-outline-primary"><a href="{% url 'login' %}" class="text-decoration-none">Login</a></button>
             <button type="button" class="btn btn-outline-primary"><a href="{% url 'signup' %}" class="text-decoration-none">SignUp</a></button>
         </div>
+        {% endif %}
     </nav>
 
     {% block main %}
