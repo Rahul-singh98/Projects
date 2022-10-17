@@ -12,26 +12,10 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 </head>
 <body>
-    <nav class="navbar navbar-light bg-light d-flex">
-        <a href="" class="navbar-brand mr-auto p-2">Stack Overflow</a>
-        <div class="p-2">
-            <form action="{% url 'home' %}" class="form-outline">
-                <input type="search" class="mr-sm-2" placeholder="Search Question" aria-label="Search" name="search">
-                <button type="button" class="btn btn-outline-success my-2 my-sm-0">Search</button>
-            </form>
-        </div>
-        {% if user.is_authenticated %}
-            <button type="button" class="btn btn-outline-primary"><a href="{% url 'login' %}" class="text-decoration-none">Logout</a></button>
-            <p>{{ user }}</p>
-        {% else %}
-        <div class="p-2">
-            <button type="button" class="btn btn-outline-primary"><a href="{% url 'login' %}" class="text-decoration-none">Login</a></button>
-            <button type="button" class="btn btn-outline-primary"><a href="{% url 'signup' %}" class="text-decoration-none">SignUp</a></button>
-        </div>
-        {% endif %}
-    </nav>
-
+    {% include 'assist/header.html' %}
+    {% include 'assist/message.html' %}
     {% block main %}
+    
     {% endblock %}
 </body>
 </html>

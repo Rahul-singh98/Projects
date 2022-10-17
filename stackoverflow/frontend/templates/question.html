@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 {% block main %}
 <div class="container">
-    <button type="submit" class="btn btn-outline-primary"><a href="/ask">Ask Question</a></button><br><br>
-    <h2>{{ question.getTitle }}</h2>
+    {% include 'assist/ask_question_temp.html' %}
+    
+    <h2>{{ question.title }}</h2>
     <div class="row">
-        <div class="col"><small>Asked {{ question.pretty_date }}</small></div>
+        <div class="col text-secondary"><small>Asked {{ question.entity.creationDateTime | timesince }} ago</small></div>
     </div>
     <hr>
     <div class="row">
         <div class="col-2">
-            {{ question.getVoteCount }}
+            {{ question.entity.numberOfUsersReported }}
         </div>
         <div class="col-10">
-            {{ question.getText }}
+            {{ question.entity.text }}
         </div>
     </div>
 </div>

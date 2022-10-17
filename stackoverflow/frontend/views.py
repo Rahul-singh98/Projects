@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate
-from django.contrib.auth.hashers import make_password, check_password
-from backend.models import RegisteredMemberModel
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from backend.models import *
 from backend.manager import RegisteredMember
 from backend.ood import Question
 from backend.utility import Tag
+from django.contrib.auth.decorators import login_required
 
 tag1 = Tag("python")
 tag2 = Tag('bash')
@@ -23,31 +25,57 @@ question2 = Question(2, member2, "Who is Frontend expert with django\
     I just wanted to know if anyone knows this please let me know.\n\
         Thanks in advance.", None, taglist)
 
+def error_404(request, exception):
+    return render(request, 'errors/404.html')
+
+def error_500(request):
+    return render(request, 'errors/500.html')
+
+
 def home(request):
     global question1, question2
-    # if request.GET.get('search'):
-    #     context = {
-    #     "questions": [question1]
-    #     }
-    # else:
     context = {
         "questions": [question1, question2]
     }
     return render(request, 'home.html', context)
 
+@login_required(login_url='login')
 def ask(request):
+    if request.method == "POST":
+        title = request.POST.get('title')
+        question = request.POST.get("question")
+        tags = request.POST.get('tags').split(',')
 
-    if not request.user.is_authenticated:
-        return redirect('login')
+        user = request.user
+        entity = TextPhotoBasedEntityModel.objects.create(
+            text=question, creator=user,
+            )
+        entity.save()
+
+        tags_list = []
+        for tag in tags:
+            tags_list.append(Tags.objects.get_or_create(tag=tag))
+        
+        ques = QuestionModel.objects.create(
+            title=title,
+            entity=entity
+        )
+        ques.tags.set = tags_list
+        ques.save()
+
+        return redirect(f'question/{ques.id}')
     return render(request, 'ask_question.html')
 
 def question(request, question_id:int):
-    global question1 , question2
-    
-    context = {
-        'question': question1 if question_id == 1 else question2
-    }
-    return render(request, 'question.html', context)
+    try:
+        question = QuestionModel.objects.get(id=question_id)
+        context = {
+            'question': question
+        }
+        return render(request, 'question.html', context)
+    except Exception as e:
+        print(e)
+        return render(request, 'errors/404.html')
 
 def user_profile(request, user_id: int):
     if not request.user.is_authenticated:
@@ -60,41 +88,42 @@ def user_profile(request, user_id: int):
     }
     return render(request, 'profile.html', context)
 
-def login(request):
-    if request.method == "POST":
+def loginView(request):
+    if request.method == "POST" and not request.user.is_authenticated:
         username = request.POST.get('user_name')
         password = request.POST.get('password')
-        print(username, password)
         user = authenticate(request, username=username, password=password)
-
-        print("User => ", user)
-        if user is None:
-            return redirect('login')
-        return render(request, 'home.html', {'user':user})
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    if request.user.is_authenticated:
+        return redirect('home')
     return render(request, 'login.html')
 
 def signup(request):
     if request.method == "POST":
-        user_name = request.POST.get('user_name')
-        f_name = request.POST.get('full_name')
+        username = request.POST.get('user_name')
+        f_name = request.POST.get('full_name').split(' ')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        cipher = make_password(password)
-
-        user = RegisteredMemberModel(
-            user_name = user_name,
-            name = f_name,
-            email = email,
-            password = cipher
-        )
-
         try:
+            user = User.objects.create_user(username=username, password=password, email=email, first_name=f_name[0], last_name=f_name[1])
             user.save()
-            authenticate(request, username=user_name, password=cipher)
-            return render(request, 'home.html')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(user)
+                return render(request, 'home.html')
         except Exception as e:
-            print(e)
-
+            messages.error(request, "Invalid credentials")
+            return render(request, 'signup.html')
 
     return render(request, 'signup.html')
+
+def logoutView(request):
+    logout(request)
+
+    return redirect('home')
+
+
+

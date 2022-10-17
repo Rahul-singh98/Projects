@@ -1,37 +1,45 @@
 {% extends 'base.html' %}
 {% block main %}
+<style>
+    .tag-icon {
+        padding: 5px 10px;
+        background: #0d6efd;
+        margin: 2px;
+        border-radius: 6px;
+    }
+
+    .tag-icon p {
+        font-size: 11px;
+        color: white;
+        margin: 0;
+    }
+</style>
 <div class="container">
-    <button type="submit" class="btn btn-outline-primary"><a href="/ask" class="text-decoration-none">Ask Question</a></button><br><br>
-    <ul>
-        {% for ques in questions %}
-        <li>
-            <div class="row">
-                <div class="col-1"><small>{{ ques.getVoteCount }} votes</small></div>
-                <div class="col-1"><small>{{ ques.getAnswersCount }} ans</small></div>
+    {% include 'assist/ask_question_temp.html' %}
+
+    {% for ques in questions %}
+    <div class="row mb-3 p-2 rounded-3" style="background: #eee;">
+        <div class="col-10">
+            <div class="d-flex">
+                <small class="me-3">{{ ques.getVoteCount }} votes</small>
+                <small>{{ ques.getAnswersCount }} ans</small>
             </div>
-            <div class="row text-primary ">
-                <div class="col-12"><h4><a href="{% url 'question' ques.getId %}" class="text-decoration-none">{{ ques.getTitle }}</a></h4></div>
-            </div>
-            <div class="row">
-                <div class="col-12">{{ ques.getText }}</div>
-            </div>
-            <div class="row">
-                <div class="col-6">
-                    <ul>
-                        {% for tag in ques.getTags %}
-                            <li class="btn btn-outline-primary p-1">{{ tag }}</li>
-                        {% endfor %}
-                    </ul>
+            <a href="{% url 'question' ques.getId %}" class="text-decoration-none mb-2">{{ ques.getTitle | title }}</a>
+            <p class="text-secondary mb-2 small">{{ ques.getText }}</p>
+            <div class="d-flex">
+                {% for tag in ques.getTags %}
+                <div class="tag-icon">
+                    <p>{{ tag | title }}</p>
                 </div>
-                <div class="col-2 text-primary">
-                    <button type="button" class="btn btn-outline-primary">
-                        <a href="{% url 'profile' ques.getCreator.getId %}" class="text-decoration-none">{{ ques.getCreator.getName }}</a>
-                    </button>
-                </div>
-                <div class="col-3"><small>{{ ques.pretty_date }} </small></div>
+                {% endfor %}
             </div>
-        </li>
-        {% endfor %}
-    </ul>
+        </div>
+        <div class="col-2">
+            <a href="{% url 'profile' ques.getCreator.getId %}" class="btn btn-outline-primary btn-sm px-3">
+                {{ ques.getCreator.getName }}</a> <br>
+            <small>{{ ques.pretty_date }} </small>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
