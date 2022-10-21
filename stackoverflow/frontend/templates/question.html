@@ -2,10 +2,11 @@
 {% block main %}
 <div class="container">
     {% include 'assist/ask_question_temp.html' %}
-    
+
     <h2>{{ question.title }}</h2>
     <div class="row">
-        <div class="col text-secondary"><small>Asked {{ question.entity.creationDateTime | timesince }} ago</small></div>
+        <div class="col text-secondary"><small>Asked {{ question.entity.creationDateTime | timesince }} ago</small>
+        </div>
     </div>
     <hr>
     <div class="row">
@@ -16,5 +17,26 @@
             {{ question.entity.text }}
         </div>
     </div>
+
+    <form action="">
+        <div class="mt-5" style="max-height: 200px;">
+            <textarea name="comments" id="comments" height="100px"></textarea>
+            <div class="d-flex justify-content-end my-3">
+                <a href="/ask" class="btn btn-outline-primary">Comment</a>
+                <!-- <input type="button" class="btn btn-outline-primary" value="Comment"> -->
+            </div>
+        </div>
+    </form>
+    <!-- <form action="">
+        <div style="max-height: 200px;" class="mt-5">
+            <textarea name="answer" id="answer" cols="30" rows="5"></textarea>
+            <div class="d-flex justify-content-end my-3">
+                <a href="/ask" class="btn btn-outline-primary">Answer</a>
+            </div>
+        </div>
+    </form> -->
+
 </div>
+{% load static %}
+<script src="{% static 'js/WYSIWYG.js' %}"></script>
 {% endblock %}
