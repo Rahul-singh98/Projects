@@ -4,23 +4,27 @@
     <table class="table table-bordered mt-5">
         <tr scope="row">
             <td>User Name</td>
-            <td>{{ user.getDisplayName }}</td>
+            <td>{{ user.user.username }}</td>
         </tr>
         <tr scope="row">
-            <td>Name</td>
-            <td>{{ user.getName }}</td>
+            <td>First Name</td>
+            <td>{{ user.user.first_name }}</td>
+        </tr>
+        <tr scope="row">
+            <td>Last Name</td>
+            <td>{{ user.user.last_name }}</td>
         </tr>
         <tr scope="row">
             <td>Email</td>
-            <td>{{ user.getEmail }}</td>
+            <td>{{ user.user.email }}</td>
         </tr>
         <tr scope="row">
             <td>Status</td>
-            <td>{{ user.getStatus.name }}</td>
+            <td>{{ user.account_state }}</td>
         </tr>
         <tr scope="row">
             <td>Reputation</td>
-            <td>{{ user.getReputation }}</td>
+            <td>{{ user.reputation }}</td>
         </tr>    
     </table>
 </div>

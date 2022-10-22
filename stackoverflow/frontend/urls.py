@@ -1,13 +1,15 @@
-from xml.dom.minidom import Document
 from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 urlpatterns = [
     path('', views.home, name='home'),
     path('ask', views.ask, name='ask'),
     path('question/<int:question_id>', views.question, name="question"),
+    path('comment/<int:question_id>', views.add_comment, name='comment'),
+    path('answer/<int:question_id>', views.add_answer, name='answer'),
     path('profile/<int:user_id>', views.user_profile, name='profile'),
     path('login', views.loginView, name='login'),
     path('signup', views.signup, name='signup'),

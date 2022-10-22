@@ -21,23 +21,23 @@
     <div class="row mb-3 p-2 rounded-3" style="background: #eee;">
         <div class="col-10">
             <div class="d-flex">
-                <small class="me-3">{{ ques.getVoteCount }} votes</small>
-                <small>{{ ques.getAnswersCount }} ans</small>
+                <small class="me-3">{{ ques.views }} views</small>
+                <!-- <small>{{ ques.getAnswersCount  ans</small> -->
             </div>
-            <a href="{% url 'question' ques.getId %}" class="text-decoration-none mb-2">{{ ques.getTitle | title }}</a>
-            <p class="text-secondary mb-2 small">{{ ques.getText }}</p>
+            <a href="{% url 'question' ques.id %}" class="text-decoration-none mb-2">{{ ques.title | title }}</a>
+            <p class="text-secondary mb-2 small">{{ ques.entity.text | safe }}</p>
             <div class="d-flex">
-                {% for tag in ques.getTags %}
+                {% for t in ques.getTags %}
                 <div class="tag-icon">
-                    <p>{{ tag | title }}</p>
+                    <p>{{ t.tag }}</p>
                 </div>
                 {% endfor %}
             </div>
         </div>
         <div class="col-2">
-            <a href="{% url 'profile' ques.getCreator.getId %}" class="btn btn-outline-primary btn-sm px-3">
-                {{ ques.getCreator.getName }}</a> <br>
-            <small>{{ ques.pretty_date }} </small>
+            <a href="{% url 'profile' ques.entity.creator.id %}" class="btn btn-outline-primary btn-sm px-3">
+                {{ ques.entity.creator.username }}</a> <br>
+            <small>{{ ques.entity.creationDateTime | timesince }} ago</small>
         </div>
     </div>
     {% endfor %}
