@@ -89,10 +89,13 @@ class QuestionModel(models.Model):
         return self.answer.all()
 
     def __lt__(self, cls):
-        return self.views < cls.views
+        return self.views > cls.views
 
     def __eq__(self, cls):
         return self.views == cls.views
+
+    def __gt__(self, cls):
+        return self.views < cls.views
 
 
 class AnswerModel(models.Model):

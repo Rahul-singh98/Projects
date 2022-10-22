@@ -1,4 +1,4 @@
-from django.shortcuts import HttpResponseRedirect, render, redirect
+from django.shortcuts import HttpResponse, HttpResponseRedirect, render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from backend.most_viewed import MostViewed
 
 most_viewed = MostViewed()
+is_cached = False
 
 
 def error_404(request, exception):
@@ -18,9 +19,12 @@ def error_500(request):
 
 
 def home(request):
-    global most_viewed
-    for ques in QuestionModel.objects.all():
-        most_viewed.add(ques)
+    global most_viewed, is_cached
+    if not is_cached:
+        for ques in QuestionModel.objects.all():
+            most_viewed.add(ques)
+        is_cached = True
+
     context = {
         "questions": most_viewed.get_list
     }
@@ -32,7 +36,8 @@ def ask(request):
     if request.method == "POST":
         title = request.POST.get('title')
         question = request.POST.get("question")
-        tags_list = [t.strip().lower() for t in request.POST.get('tags').split(',')]
+        tags_list = [t.strip().lower()
+                     for t in request.POST.get('tags').split(',')]
 
         user = request.user
         entity = TextPhotoBasedEntityModel.objects.create(
@@ -109,17 +114,68 @@ def question(request, question_id: int):
     global most_viewed
     try:
         question = QuestionModel.objects.get(id=question_id)
+        most_viewed.add(question)
         question.views += 1
         question.save()
 
-        most_viewed.add(question)
+        upvotes = question.entity.membersWhoUpvoted.filter(
+            id=request.user.id).count()
+        downvotes = question.entity.membersWhoDownvoted.filter(
+            id=request.user.id).count()
+
+        votes_ud = -1
+        if upvotes > 0:
+            votes_ud = 0
+        elif downvotes > 0:
+            votes_ud = 1
+        # print(upvotes, downvotes, votes_ud)
         context = {
-            'question': question
+            'question': question,
+            'votes_ud': votes_ud
         }
         return render(request, 'question.html', context)
     except Exception as e:
         messages.error(request, f"{e}")
         return render(request, 'errors/404.html')
+
+
+def votes(request):
+    q_id = int(request.POST.get('id'))
+    vote_type = request.POST.get('type')
+    vote_action = request.POST.get('action')
+
+    question = QuestionModel.objects.get(id=q_id)
+
+    upvotes = question.entity.membersWhoUpvoted.filter(
+        id=request.user.id).count()
+    downvotes = question.entity.membersWhoDownvoted.filter(
+        id=request.user.id).count()
+
+    if(vote_action == 'vote'):
+        if(upvotes == 0 and downvotes == 0):
+            if(vote_type == 'up'):
+                print("upvoting")
+                question.entity.membersWhoUpvoted.add(request.user.id)
+            elif(vote_type == 'down'):
+                print('downvoting')
+                question.entity.membersWhoDownvoted.add(request.user.id)
+            else:
+                return HttpResponse('error')
+        else:
+            return HttpResponse("already voted")
+    elif(vote_action == 'recall-vote'):
+        if(vote_type == 'up' and upvotes == 1):
+            print("upvoting")
+            question.entity.membersWhoUpvoted.remove(request.user.id)
+        elif(vote_type == 'down' and downvotes == 1):
+            print("downvoting")
+            question.entity.membersWhoDownvoted.remove(request.user.id)
+        else:
+            return HttpResponse('error')
+    else:
+        return HttpResponse("unknown")
+    print("return true")
+    return HttpResponse(5)
 
 
 @login_required
@@ -150,11 +206,14 @@ def loginView(request):
     return render(request, 'login.html')
 
 
+
+
 def signup(request):
     if request.method == "POST" and not request.user.is_authenticated:
         username = request.POST.get('user_name')
         f_name = request.POST.get('full_name').split(' ')
-        if len(f_name) < 2: f_name.append(' ')
+        if len(f_name) < 2:
+            f_name.append(' ')
         email = request.POST.get('email')
         password = request.POST.get('password')
         try:

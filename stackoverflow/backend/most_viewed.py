@@ -1,6 +1,57 @@
 from .models import QuestionModel
-from heapq import *
 import pickle
+
+
+def max_heapify(heap: list, idx: int):
+    size = len(heap)
+    if size < 1: return
+
+    largest = idx
+    left = 2 * idx + 1
+    right = 2 * idx + 2
+
+    if left < size and heap[largest] < heap[left]:
+        largest = left
+
+    if right < size and heap[largest] < heap[right]:
+        largest = right
+    
+    if(largest != idx):
+        heap[largest], heap[idx] = heap[idx], heap[largest]
+        max_heapify(heap, largest)
+
+
+def min_heapify(heap: list, idx: int):
+    size = len(heap)
+    if size < 1: return
+
+    minimum = idx
+    left = 2 * idx + 1
+    right = 2 * idx + 2
+
+    if left < size and heap[minimum] > heap[left]:
+        minimum = left
+
+    if right < size and heap[minimum] > heap[right]:
+        minimum = right
+    
+    if(minimum != idx):
+        heap[minimum], heap[idx] = heap[idx], heap[minimum]
+        min_heapify(heap, minimum)
+
+
+class HomePageObjects:
+    def __init__(self, max_size=10):
+        self.most_viewed = MostViewed(max_size)
+
+    def add(self, question: QuestionModel):
+        self.most_viewed.add(question)
+
+
+class MostVoted:
+    def __init__(self, max_size=10):
+        self._object_instances = []
+        self._max_size = max_size
 
 
 class MostViewed:
@@ -8,31 +59,22 @@ class MostViewed:
     def __init__(self, max_size=10):
         self._object_instances = []
         self._max_size = max_size
-        # try:
-        #     with open('most_viewed_model', 'rb') as f:
-        #         self._object_instances = pickle.load(f)
-        # except Exception as e:
-        #     print("[Error ]",e)
-        # finally:
-        # heapify(self._object_instances)
 
     def add(self, question: QuestionModel):
         if len(self._object_instances) >= self._max_size:
-            heappop(self._object_instances)
-            # self._pop_element()
-        question.views = -1 * question.views
-        if question not in self._object_instances:
-            heappush(self._object_instances, question)
-        else:
-            idx = self._object_instances.index(question)
-            self._object_instances[idx] = question
-            heapify(self._object_instances)
-        question.views = -1 * question.views
+            self._object_instances.pop()
+        
+        idx = self._is_exists(question)
+        if idx == -1:
+            self._object_instances.append(question)
+            return 
+        self._object_instances[idx] = question
 
-        # with open('most_viewed_model', 'wb') as f:
-        #     pickle.dump(self._object_instances, f)
-        # self._push_element(question)
+    def _is_exists(self, ques):
+        for idx, q in enumerate(self._object_instances):
+            if q.id == ques.id: return idx
+        return -1
 
     @property
     def get_list(self):
-        return self._object_instances
+        return sorted(self._object_instances)

@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block main %}
 <div class="container">
+    {% load static %}
     {% include 'assist/ask_question_temp.html' %}
-
     <h2>{{ question.title }}</h2>
     <div class="row">
         <div class="col text-secondary"><small>Asked {{ question.entity.creationDateTime | timesince }} ago</small>
@@ -11,7 +11,23 @@
     <hr>
     <div class="row">
         <div class="col-2">
-            {{ question.views }}
+            <div class="row-sm">
+                {% if votes_ud == 0 %}                
+                    <img class="upvote selected" src="/static/images/upvote-on.svg" alt="upvote" width="20px" height="20px">
+                {% else %}
+                    <img class="upvote" src="/static/images/upvote-off.svg" alt="upvote" width="20px" height="20px">
+                {% endif %}
+            </div>
+            <div class="row">
+                <p class="mt-1 mb-1">{{ question.views | title }}</p>
+            </div>
+            <div class="row-sm">
+                {% if votes_ud == 1 %}
+                    <img class="downvote selected" src="/static/images/downvote-on.svg" alt="downvote" width="20px" height="20px">
+                {% else %}
+                    <img class="downvote" src="/static/images/downvote-off.svg" alt="downvote" width="20px" height="20px">
+                {% endif %}
+            </div>
         </div>
         <div class="col-10">
             {{ question.entity.text | safe }}
@@ -71,6 +87,62 @@
 
 
 </div>
-{% load static %}
 <script src="{% static 'js/WYSIWYG.js' %}"></script>
+<script>
+    $(document).ready(function() {
+        $('img.upvote').click(function () {
+            var id = '{{ question.id }}';
+            var vote_type = 'up';
+
+            if ($(this).hasClass('selected')) {
+                var vote_action = 'recall-vote'
+                $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (response) {
+                    console.log(response)
+                    if (Number.isInteger(response)) {
+                        $('img.upvote').removeAttr('src')
+                            .attr('src', '/static/images/upvote-off.svg')
+                            .removeClass('selected');
+                    }
+                });
+            } else {
+                var vote_action = 'vote'
+                $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (response) {
+                    console.log(response)
+                    if (Number.isInteger(response)) {
+                        $('img.upvote').removeAttr('src')
+                            .attr('src', '/static/images/upvote-on.svg')
+                            .addClass('selected')
+                    }
+                });
+            }
+        })
+
+        $('img.downvote').click(function () {
+            var id = '{{ question.id }}';
+            var vote_type = 'up';
+
+            if ($(this).hasClass('selected')) {
+                var vote_action = 'recall-vote'
+                $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (response) {
+                    console.log(response)
+                    if (Number.isInteger(response)) {
+                        $('img.downvote').removeAttr('src')
+                            .attr('src', '/static/images/downvote-off.svg')
+                            .removeClass('selected');
+                    }
+                });
+            } else {
+                var vote_action = 'vote'
+                $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (response) {
+                    console.log(response)
+                    if (Number.isInteger(response)) {
+                        $('img.downvote').removeAttr('src')
+                            .attr('src', '/static/images/downvote-on.svg')
+                            .addClass('selected')
+                    }
+                });
+            }
+        })
+    });
+</script>
 {% endblock %}
