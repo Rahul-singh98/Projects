@@ -68,6 +68,15 @@ class QuestionModel(models.Model):
         "TextPhotoBasedEntityModel", on_delete=models.CASCADE)
     views = models.IntegerField(default=0)
 
+    @property
+    def getTags(self):
+        return self.tags.all()
+
+    @property
+    def votes_count(self):
+        return (self.entity.membersWhoUpvoted.all().count()
+            - self.entity.membersWhoDownvoted.all().count())
+
 
 class AnswerModel(models.Model):
     solved_problem = models.BooleanField(default=False)

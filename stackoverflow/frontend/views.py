@@ -5,9 +5,24 @@ from django.contrib import messages
 from backend.models import *
 from django.contrib.auth.decorators import login_required
 from backend.manager import QuestionListManager
+from django import template
 
 home_manager = QuestionListManager()
 is_cached = False
+
+register = template.Library()
+@register.filter(name='pretty_numbers', is_safe=False)
+def pretty_numbers(val, precision=2):
+    try:
+        int_val = int(val)
+    except ValueError:
+        raise template.TemplateSyntaxError("value must be int")
+    if int_val < 1000:
+        return str(int_val)
+    elif(int_val < 1_000_000):
+        return f'{int_val/1000.0:.{precision}f}'.rstrip('0').rstrip('.') + 'K'
+    else:
+        return f'{int_val/1_000_000.0:.{precision}f}'.rstrip('0').rstrip('.') + 'M'
 
 
 def error_404(request, exception):
@@ -18,7 +33,7 @@ def error_500(request):
     return render(request, 'errors/500.html')
 
 
-def home(request):
+def homepage(request):
     global home_manager, is_cached
     if not is_cached:
         for ques in QuestionModel.objects.all():
@@ -32,7 +47,7 @@ def home(request):
 
 
 @login_required(login_url='login')
-def ask(request):
+def ask_question(request):
     if request.method == "POST":
         title = request.POST.get('title')
         question = request.POST.get("question")
@@ -52,7 +67,7 @@ def ask(request):
         ques.save()
 
         for tag in tags_list:
-            tag = Tags.objects.get_or_create(tag=tags_list)
+            tag = Tags.objects.get_or_create(tag=tag)
             ques.tags.add(tag[0].id)
 
         return redirect(f'question/{ques.id}')
@@ -110,13 +125,12 @@ def add_answer(request, question_id: int):
         return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
-def question(request, question_id: int):
+def view_question(request, question_id: int):
     global home_manager
     try:
         question = QuestionModel.objects.get(id=question_id)
-        home_manager.add(question)
         question.views += 1
-        question.save()
+        home_manager.add(question)
 
         upvotes = question.entity.membersWhoUpvoted.filter(
             id=request.user.id).count()
@@ -132,14 +146,14 @@ def question(request, question_id: int):
             'question': question,
             'votes_ud': votes_ud
         }
-        return render(request, 'question.html', context)
+        return render(request, 'view_question.html', context)
     except Exception as e:
         messages.error(request, f"{e}")
         return render(request, 'errors/404.html')
 
 
 @login_required
-def votes(request):
+def handle_votes(request):
     if request.method == "POST":
         q_id = int(request.POST.get('id'))
         vote_type = request.POST.get('type')
@@ -160,10 +174,16 @@ def votes(request):
                     question.entity.membersWhoDownvoted.add(request.user.id)
                 else:
                     return HttpResponse('error')
+            elif(upvotes == 1 and vote_type == 'down'):
+                question.entity.membersWhoUpvoted.remove(request.user.id)
+                question.entity.membersWhoDownvoted.add(request.user.id)
+            elif(downvotes == 1 and vote_type == 'up'):
+                question.entity.membersWhoUpvoted.add(request.user.id)
+                question.entity.membersWhoDownvoted.remove(request.user.id)
             else:
                 return HttpResponse("already voted")
         elif(vote_action == 'recall-vote'):
-            if(vote_type == 'up' and upvotes == 1):                
+            if(vote_type == 'up' and upvotes == 1):
                 question.entity.membersWhoUpvoted.remove(request.user.id)
             elif(vote_type == 'down' and downvotes == 1):
                 question.entity.membersWhoDownvoted.remove(request.user.id)
@@ -171,11 +191,11 @@ def votes(request):
                 return HttpResponse('error')
         else:
             return HttpResponse("unknown")
-        return HttpResponse(5)
+        return HttpResponse("ok")
 
 
 @login_required
-def user_profile(request, user_id: int):
+def display_user_profile(request, user_id: int):
     try:
         user = RegisteredMemberModel.objects.get(id=user_id)
         context = {
@@ -187,7 +207,7 @@ def user_profile(request, user_id: int):
         return render(request, 'errors/404.html')
 
 
-def loginView(request):
+def handle_login(request):
     if request.method == "POST" and not request.user.is_authenticated:
         username = request.POST.get('user_name')
         password = request.POST.get('password')
@@ -198,10 +218,7 @@ def loginView(request):
     if request.user.is_authenticated:
         return redirect('home')
 
-    messages.error(request, "User doesnot exists")
     return render(request, 'login.html')
-
-
 
 
 def signup(request):
@@ -228,7 +245,8 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-def logoutView(request):
-    logout(request)
-
-    return redirect('home')
+def handle_logout(request):
+    if request.user.is_authenticated:
+        logout(request)
+        return redirect('home')
+    return render(request, 'errors/404.html')    

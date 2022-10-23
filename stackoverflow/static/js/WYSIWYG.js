@@ -53,7 +53,7 @@ tinymce.init({
     plugins: 'print paste autolink autosave save directionality code image link media charmap hr pagebreak nonbreaking anchor insertdatetime advlist lists noneditable emoticons',
     imagetools_cors_hosts: ['picsum.photos'],
     menubar:"",
-    // toolbar: 'undo redo | bold codesample template removeformat image| fullscreen  preview | fontselect fontsizeselect styleselect | hr alignleft aligncenter alignright alignjustify | numlist bullist  | italic forecolor backcolor  outdent indent formatselect  | pagebreak | charmap emoticons | save print | insertfile image media link anchor underline strikethrough| ltr rtl',
+    toolbar: 'undo redo | bold codesample template removeformat image| fullscreen  preview | fontselect fontsizeselect styleselect | hr alignleft aligncenter alignright alignjustify | numlist bullist  | italic forecolor backcolor  outdent indent formatselect  | pagebreak | charmap emoticons | insertfile image media link anchor underline strikethrough| ltr rtl',
 
     toolbar_sticky: true,
     autosave_ask_before_unload: true,
@@ -74,7 +74,8 @@ tinymce.init({
 
     template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
     template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
-    height: 150,
+    height: 200,
+    resize: true,
     image_caption: true,
     quickbars_selection_toolbar: 'h1 h2 h3 h4 h5  | quickimage quicktable |',
     quickbars_insert_toolbar: 'quicktable image media codesample templates',
@@ -93,37 +94,3 @@ tinymce.init({
     // content_style: "img { margin: 0 px; }",
       
 });
-
-// document.addEventListener("DOMContentLoaded", function (event) {
-//     let sc = document.createElement('script');
-//     // sc.setAttribute('src', "https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js");
-//     sc.setAttribute('referrerpolicy','origin')
-
-//     document.head.appendChild(sc);
-
-//     sc.onload = () => {
-
-        
-//     }
-// });
-
-
-// <script src="https://cdn.tiny.cloud/1/55px6772jonjrhzyu0drrubwrwptayhfxvsx5060vi6l0ss7/tinymce/6/plugins.min.js" referrerpolicy="origin"></script>
-// <!-- This script provides access to tinyMCE’s premium plugins. -->
-// </head>
-// <body>
-// <textarea>
-// Welcome to TinyMCE!
-// </textarea>
-// <script>
-// tinymce.init({
-//     selector: 'textarea',
-//     plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage tinycomments tableofcontents footnotes mergetags autocorrect',
-//     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
-//     tinycomments_mode: 'embedded',
-//     tinycomments_author: 'Author name',
-//     mergetags_list: [
-//     { value: 'First.Name', title: 'First Name' },
-//     { value: 'Email', title: 'Email' },
-//     ],
-//     });

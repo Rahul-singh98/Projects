@@ -54,6 +54,10 @@ class BaseMixin:
     def getAnswers(self):
         return self._base.answer.all()
 
+    @property
+    def votes_count(self):
+        return self._base.votes_count
+
 
 class DecreasingViewsMixin(BaseMixin):
 

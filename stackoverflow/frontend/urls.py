@@ -5,16 +5,16 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('ask', views.ask, name='ask'),
-    path('question/<int:question_id>', views.question, name="question"),
-    path('question/vote', views.votes, name='votes'),
+    path('', views.homepage, name='home'),
+    path('ask', views.ask_question, name='ask'),
+    path('question/<int:question_id>', views.view_question, name="question"),
+    path('question/vote', views.handle_votes, name='votes'),
     path('comment/<int:question_id>', views.add_comment, name='comment'),
     path('answer/<int:question_id>', views.add_answer, name='answer'),
-    path('profile/<int:user_id>', views.user_profile, name='profile'),
-    path('login', views.loginView, name='login'),
+    path('profile/<int:user_id>', views.display_user_profile, name='profile'),
+    path('login', views.handle_login, name='login'),
     path('signup', views.signup, name='signup'),
-    path('logout', views.logoutView, name='logout'),
+    path('logout', views.handle_logout, name='logout'),
 ]
 
 if settings.DEBUG:
