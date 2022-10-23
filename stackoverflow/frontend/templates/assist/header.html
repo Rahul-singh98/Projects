@@ -1,8 +1,9 @@
 <header class="container-fluid p-0" style="background:#eee; height: 65px;">
     <div class="container d-flex justify-content-between align-items-center p-2">
         <a href="{% url 'home' %}" class="navbar-brand mr-auto p-2">Stack Overflow</a>
-        <form action="{% url 'home' %}" class="d-flex justify-content-center align-items-center">
-            <input type="search" class="form-control form-control-sm me-2"  placeholder="Search Question" aria-label="Search" name="search">
+        <form action="{% url 'search' %}" method="POST" class="d-flex justify-content-center align-items-center">
+            {% csrf_token %}
+            <input type="search" class="form-control form-control-sm me-2"  placeholder="Search Question" aria-label="Search" name="search" id="search">
             <input type="submit" class="btn btn-outline-success btn-sm" value="Search">
         </form>
 

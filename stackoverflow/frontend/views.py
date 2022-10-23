@@ -6,6 +6,7 @@ from backend.models import *
 from django.contrib.auth.decorators import login_required
 from backend.manager import QuestionListManager
 from django import template
+from django.db.models import Q
 
 home_manager = QuestionListManager()
 is_cached = False
@@ -205,6 +206,21 @@ def display_user_profile(request, user_id: int):
     except Exception as e:
         messages.error(request, f"{e}")
         return render(request, 'errors/404.html')
+
+
+def search_titles(request):
+    if request.method == "POST":
+        words = request.POST.get('search')
+        questions = QuestionModel.objects.filter(
+            Q(title__icontains=words)
+        )
+        context = {
+            'questions': questions,
+            'count': questions.count()
+        }
+        return render(request, 'search_result.html', context)
+    messages(request, "Invalid request")
+    return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
 
 def handle_login(request):

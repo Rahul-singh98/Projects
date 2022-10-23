@@ -12,6 +12,7 @@ urlpatterns = [
     path('comment/<int:question_id>', views.add_comment, name='comment'),
     path('answer/<int:question_id>', views.add_answer, name='answer'),
     path('profile/<int:user_id>', views.display_user_profile, name='profile'),
+    path('search', views.search_titles, name='search'),
     path('login', views.handle_login, name='login'),
     path('signup', views.signup, name='signup'),
     path('logout', views.handle_logout, name='logout'),
