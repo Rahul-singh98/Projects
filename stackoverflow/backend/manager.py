@@ -1,117 +1,76 @@
-from .constants import AccountStatus
+from .models import QuestionModel
+from .mixin import DecreasingViewsMixin, RecentMixin
 
 
-class Member:
+class QuestionListManager:
 
-    def __init__(self, id):
-        self._id = id
-        self._accountStatus = 0
-        self._name = None
-        self._displayName = None
-        self._email = None
-        self._reputation = 0
-        self._isModerator = False
-        self._isAdmin = False
+    def __init__(self, max_size=10):
+        self._context = [MostViewed(max_size), RecentCreated(max_size)]
 
-        self._accountStatus = AccountStatus.ACTIVE
-
-    def closeAccount(self):
-        self._accountStatus = AccountStatus.CLOSED
-
-    def cancelAccount(self):
-        self._accountStatus = AccountStatus.CANCELED
-
-    def blacklist(self):
-        self._accountStatus = AccountStatus.BLACKLISTED
-
-    def block(self):
-        self._accountStatus = AccountStatus.BLOCKED
-
-    def blockMember(self, member):
-        if self._isAdmin:
-            member.block()
-            return True
-        return False
-
-    def unblockMember(self, member):
-        if self._isAdmin:
-            member._accountStatus = AccountStatus.ACTIVE
-            return True
-        return False
-
-    def closeQuestion(self, question):
-        if self._isAdmin or self._isModerator or self._id == question.getCreator().getId():
-            question.close()
-            return True
-        return False
-
-    def promoteToAdmin(self):
-        self._isAdmin = True
-
-    def promoteToModerator(self):
-        self._isModerator = True
-
-    def giveBountyTo(self, bountyReputation, receiver):
-        if bountyReputation <= self.getReputation() and self._id != receiver.getId():
-            self._reputation -= bountyReputation
-            receiver.receiveBounty(bountyReputation)
-        return False
+    def add(self, question: QuestionModel):
+        for context in self._context:
+            context.add(question)
 
     @property
-    def receiveBounty(self, bountyReputation):
-        self._reputation += bountyReputation
+    def most_views_list(self):
+        return self._context[0].get_list()
 
     @property
-    def getReputation(self):
-        return self._reputation
-
-    @property
-    def getId(self):
-        return self._id
-
-    @property
-    def getStatus(self):
-        return self._accountStatus
-
-    @property
-    def getName(self):
-        return self._name
-
-    @property
-    def getDisplayName(self):
-        return self._displayName
-
-    @property
-    def getEmail(self):
-        return self._email
+    def recently_created_list(self):
+        return self._context[1].get_list()
 
 
-class RegisteredMember(Member):
-    
-    def __init__(self, id, name, displayName, email):
-        super().__init__(id)
-        self._name = name
-        self._displayName = displayName
-        self._email = email
-        
+class MostViewed:
+
+    def __init__(self, max_size=10):
+        self._object_instances = []
+        self._max_size = max_size
+
+    def add(self, question: QuestionModel):
+        question = DecreasingViewsMixin(question)
+
+        if len(self._object_instances) >= self._max_size:
+            self._object_instances.pop()
+
+        idx = self._is_exists(question)
+        if idx == -1:
+            self._object_instances.append(question)
+            return
+        self._object_instances[idx] = question
+
+    def _is_exists(self, ques):
+        for idx, q in enumerate(self._object_instances):
+            if q.id == ques.id:
+                return idx
+        return -1
+
+    def get_list(self):
+        return sorted(self._object_instances)
 
 
-class Admin(Member):
+class RecentCreated:
 
-    def __init__(self, id, name, displayName, email):
-        super().__init__(id)
-        self._name = name
-        self._displayName = displayName
-        self._email = email
-        self.promoteToAdmin()
+    def __init__(self, max_size=10):
+        self._object_instances = []
+        self._max_size = max_size
 
+    def add(self, question: QuestionModel):
+        question = RecentMixin(question)
 
-class Moderator(Member):
+        if len(self._object_instances) >= self._max_size:
+            self._object_instances.pop()
 
-    def __init__(self, id, name, displayName, email):
-        super().__init__(id)
-        self._name = name
-        self._displayName = displayName
-        self._email = email
-        self.promoteToModerator()
-        
+        idx = self._is_exists(question)
+        if idx == -1:
+            self._object_instances.append(question)
+            return
+        self._object_instances[idx] = question
+
+    def _is_exists(self, ques):
+        for idx, q in enumerate(self._object_instances):
+            if q.id == ques.id:
+                return idx
+        return -1
+
+    def get_list(self):
+        return sorted(self._object_instances)

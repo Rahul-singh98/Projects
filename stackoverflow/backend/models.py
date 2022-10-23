@@ -68,35 +68,6 @@ class QuestionModel(models.Model):
         "TextPhotoBasedEntityModel", on_delete=models.CASCADE)
     views = models.IntegerField(default=0)
 
-    @property
-    def getVoteCount(self):
-        return len(self.entity.membersWhoDownvoted.all()) - len(self.entity.membersWhoUpvoted.all())
-
-    @property
-    def getAnswersCount(self):
-        return len(self.answer.all())
-
-    @property
-    def getTags(self):
-        return self.tags.all()
-
-    @property
-    def getComments(self):
-        return self.comments.all()
-
-    @property
-    def getAnswers(self):
-        return self.answer.all()
-
-    def __lt__(self, cls):
-        return self.views > cls.views
-
-    def __eq__(self, cls):
-        return self.views == cls.views
-
-    def __gt__(self, cls):
-        return self.views < cls.views
-
 
 class AnswerModel(models.Model):
     solved_problem = models.BooleanField(default=False)

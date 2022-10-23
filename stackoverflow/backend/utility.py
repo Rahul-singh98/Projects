@@ -1,43 +1,36 @@
-import time
+def max_heapify(heap: list, idx: int):
+    size = len(heap)
+    if size < 1: return
+
+    largest = idx
+    left = 2 * idx + 1
+    right = 2 * idx + 2
+
+    if left < size and heap[largest] < heap[left]:
+        largest = left
+
+    if right < size and heap[largest] < heap[right]:
+        largest = right
+    
+    if(largest != idx):
+        heap[largest], heap[idx] = heap[idx], heap[largest]
+        max_heapify(heap, largest)
 
 
-class Photo:
-    def __init__(self, id, photoPath, creator):
-        self._id = id
-        self._photoPath = photoPath
-        self._creationDate = round(time.time() * 1000)
-        self._creatingMember = creator
+def min_heapify(heap: list, idx: int):
+    size = len(heap)
+    if size < 1: return
 
-    def equals(self, that):
-        if isinstance(that, Photo):
-            return self._id == (that)._id
-        return False
+    minimum = idx
+    left = 2 * idx + 1
+    right = 2 * idx + 2
 
-    def getId(self):
-        return self._id
+    if left < size and heap[minimum] > heap[left]:
+        minimum = left
 
-    def getPhotoPath(self):
-        return self._photoPath
-
-    def getCreationDate(self):
-        return self._creationDate
-
-    def getCreatingMember(self):
-        return self._creatingMember
-
-
-class Bounty:
-    def __init__(self, reputation, expirationDate):
-        self._reputation = reputation
-        self._expirationdate = expirationDate
-
-    def modifyReputation(self, reputation):
-        self._reputation = reputation
-
-
-class Tag:
-    def __init__(self, text):
-        self._text = text
-
-    def getText(self):
-        return self._text
+    if right < size and heap[minimum] > heap[right]:
+        minimum = right
+    
+    if(minimum != idx):
+        heap[minimum], heap[idx] = heap[idx], heap[minimum]
+        min_heapify(heap, minimum)

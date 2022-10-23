@@ -4,9 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from backend.models import *
 from django.contrib.auth.decorators import login_required
-from backend.most_viewed import MostViewed
+from backend.manager import QuestionListManager
 
-most_viewed = MostViewed()
+home_manager = QuestionListManager()
 is_cached = False
 
 
@@ -19,14 +19,14 @@ def error_500(request):
 
 
 def home(request):
-    global most_viewed, is_cached
+    global home_manager, is_cached
     if not is_cached:
         for ques in QuestionModel.objects.all():
-            most_viewed.add(ques)
+            home_manager.add(ques)
         is_cached = True
 
     context = {
-        "questions": most_viewed.get_list
+        "questions": home_manager
     }
     return render(request, 'home.html', context)
 
@@ -45,7 +45,6 @@ def ask(request):
         )
         entity.save()
 
-        Tags.objects.get_or_create(tag=tags_list)
         ques = QuestionModel.objects.create(
             title=title,
             entity=entity
@@ -53,7 +52,8 @@ def ask(request):
         ques.save()
 
         for tag in tags_list:
-            ques.tags.add(Tags.objects.get(tag=tag).id)
+            tag = Tags.objects.get_or_create(tag=tags_list)
+            ques.tags.add(tag[0].id)
 
         return redirect(f'question/{ques.id}')
     return render(request, 'ask_question.html')
@@ -111,10 +111,10 @@ def add_answer(request, question_id: int):
 
 
 def question(request, question_id: int):
-    global most_viewed
+    global home_manager
     try:
         question = QuestionModel.objects.get(id=question_id)
-        most_viewed.add(question)
+        home_manager.add(question)
         question.views += 1
         question.save()
 
@@ -128,7 +128,6 @@ def question(request, question_id: int):
             votes_ud = 0
         elif downvotes > 0:
             votes_ud = 1
-        # print(upvotes, downvotes, votes_ud)
         context = {
             'question': question,
             'votes_ud': votes_ud
@@ -139,43 +138,40 @@ def question(request, question_id: int):
         return render(request, 'errors/404.html')
 
 
+@login_required
 def votes(request):
-    q_id = int(request.POST.get('id'))
-    vote_type = request.POST.get('type')
-    vote_action = request.POST.get('action')
+    if request.method == "POST":
+        q_id = int(request.POST.get('id'))
+        vote_type = request.POST.get('type')
+        vote_action = request.POST.get('action')
 
-    question = QuestionModel.objects.get(id=q_id)
+        question = QuestionModel.objects.get(id=q_id)
 
-    upvotes = question.entity.membersWhoUpvoted.filter(
-        id=request.user.id).count()
-    downvotes = question.entity.membersWhoDownvoted.filter(
-        id=request.user.id).count()
+        upvotes = question.entity.membersWhoUpvoted.filter(
+            id=request.user.id).count()
+        downvotes = question.entity.membersWhoDownvoted.filter(
+            id=request.user.id).count()
 
-    if(vote_action == 'vote'):
-        if(upvotes == 0 and downvotes == 0):
-            if(vote_type == 'up'):
-                print("upvoting")
-                question.entity.membersWhoUpvoted.add(request.user.id)
-            elif(vote_type == 'down'):
-                print('downvoting')
-                question.entity.membersWhoDownvoted.add(request.user.id)
+        if(vote_action == 'vote'):
+            if(upvotes == 0 and downvotes == 0):
+                if(vote_type == 'up'):
+                    question.entity.membersWhoUpvoted.add(request.user.id)
+                elif(vote_type == 'down'):
+                    question.entity.membersWhoDownvoted.add(request.user.id)
+                else:
+                    return HttpResponse('error')
+            else:
+                return HttpResponse("already voted")
+        elif(vote_action == 'recall-vote'):
+            if(vote_type == 'up' and upvotes == 1):                
+                question.entity.membersWhoUpvoted.remove(request.user.id)
+            elif(vote_type == 'down' and downvotes == 1):
+                question.entity.membersWhoDownvoted.remove(request.user.id)
             else:
                 return HttpResponse('error')
         else:
-            return HttpResponse("already voted")
-    elif(vote_action == 'recall-vote'):
-        if(vote_type == 'up' and upvotes == 1):
-            print("upvoting")
-            question.entity.membersWhoUpvoted.remove(request.user.id)
-        elif(vote_type == 'down' and downvotes == 1):
-            print("downvoting")
-            question.entity.membersWhoDownvoted.remove(request.user.id)
-        else:
-            return HttpResponse('error')
-    else:
-        return HttpResponse("unknown")
-    print("return true")
-    return HttpResponse(5)
+            return HttpResponse("unknown")
+        return HttpResponse(5)
 
 
 @login_required
