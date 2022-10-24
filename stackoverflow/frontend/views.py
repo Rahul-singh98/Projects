@@ -131,6 +131,7 @@ def view_question(request, question_id: int):
     try:
         question = QuestionModel.objects.get(id=question_id)
         question.views += 1
+        question.save()
         home_manager.add(question)
 
         upvotes = question.entity.membersWhoUpvoted.filter(
@@ -161,6 +162,8 @@ def handle_votes(request):
         vote_action = request.POST.get('action')
 
         question = QuestionModel.objects.get(id=q_id)
+        if(question.entity.creator.id == request.user.id):
+            return HttpResponse("Same user")
 
         upvotes = question.entity.membersWhoUpvoted.filter(
             id=request.user.id).count()
