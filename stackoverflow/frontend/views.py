@@ -44,7 +44,7 @@ def homepage(request):
     context = {
         "questions": home_manager
     }
-    return render(request, 'home.html', context)
+    return render(request, 'frontend/home.html', context)
 
 
 @login_required(login_url='login')
@@ -71,8 +71,8 @@ def ask_question(request):
             tag = Tags.objects.get_or_create(tag=tag)
             ques.tags.add(tag[0].id)
 
-        return redirect(f'question/{ques.id}')
-    return render(request, 'ask_question.html')
+        return redirect(f'frontend/question/{ques.id}')
+    return render(request, 'frontend/ask_question.html')
 
 
 @login_required
@@ -148,7 +148,7 @@ def view_question(request, question_id: int):
             'question': question,
             'votes_ud': votes_ud
         }
-        return render(request, 'view_question.html', context)
+        return render(request, 'frontend/view_question.html', context)
     except Exception as e:
         messages.error(request, f"{e}")
         return render(request, 'errors/404.html')
@@ -205,7 +205,7 @@ def display_user_profile(request, user_id: int):
         context = {
             'user': user
         }
-        return render(request, 'profile.html', context)
+        return render(request, 'frontend/profile.html', context)
     except Exception as e:
         messages.error(request, f"{e}")
         return render(request, 'errors/404.html')
@@ -221,7 +221,7 @@ def search_titles(request):
             'questions': questions,
             'count': questions.count()
         }
-        return render(request, 'search_result.html', context)
+        return render(request, 'frontend/search_result.html', context)
     messages(request, "Invalid request")
     return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
@@ -237,7 +237,7 @@ def handle_login(request):
     if request.user.is_authenticated:
         return redirect('home')
 
-    return render(request, 'login.html')
+    return render(request, 'frontend/login.html')
 
 
 def signup(request):
@@ -258,10 +258,10 @@ def signup(request):
                 return render(request, 'home.html')
         except Exception as e:
             messages.error(request, f"Invalid credentials, {e}")
-            return render(request, 'signup.html')
+            return render(request, 'frontend/signup.html')
     if request.user.is_authenticated:
-        return render(request, 'home.html')
-    return render(request, 'signup.html')
+        return render(request, 'frontend/home.html')
+    return render(request, 'frontend/signup.html')
 
 
 def handle_logout(request):

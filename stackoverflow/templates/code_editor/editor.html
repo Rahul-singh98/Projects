@@ -1,0 +1,17 @@
+<form id="coder_form" class="form" method="POST">
+    {% csrf_token %}
+    <div class="row d-flex justify-content-between">
+        <div class="col mb-2">
+            <button type="submit" class="btn btn-success my-0">C++</button>
+            <button type="submit" class="btn btn-success my-0">Auto</button>
+        </div>
+        <div class="col">
+            <i class="fa-solid fa-thumbs-up text-primary"></i>
+            <i class="fa-solid fa-thumbs-down text-primary"></i>
+        </div>
+    </div>
+    <div class="row" id="mydiv">
+        <textarea class="form-control" data-editor="twilight" name="program" id="id_program" cols="100" rows="30"
+            required></textarea>
+    </div>
+</form>
