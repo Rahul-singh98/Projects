@@ -1,41 +1,12 @@
 {% extends 'base.html' %}
 {% block main %}
-<!-- <style>
-    .vl {
-        border-left: 3px solid #eeeeee;
-        height: 100%;
-        position: absolute;
-        left: 50%;
-    }
-
-    .hl {
-        border-bottom: 3px solid #eeeeee;
-        width: 100%;
-        position: absolute;
-        top: 50%;
-    }
-</style> -->
-<div class="container-fluid mt-3">
-    <div class="row">
-        <div class="col-6">
-            <!-- Question Panel -->
+<div class="container-fluid" style="height: calc(100vh - 65px);">
+    <div class="d-flex w-100">
+        <div class="resize-h border-end p-3 bg-light" style="height: calc(100vh - 65px);">
             {% include 'code_editor/code_question_description.html' %}
         </div>
-        <!-- <div class="vl"></div> -->
-        <div class="col-6">
-            <div class="row">
-                <div class="col">
-                    <!-- Editor Panel -->
-                    {% include 'code_editor/editor.html' %}
-                </div>
-            </div>
-            <!-- <div class="hl"></div> -->
-            <div class="row mt-5">
-                <div class="col">
-                    <!-- Result Panel -->
-                    {% include 'code_editor/run_test.html' %}
-                </div>
-            </div>
+        <div class="p-3 w-50 bg-dark" style="flex-grow: 3;">
+            {% include 'code_editor/editor.html' %}
         </div>
     </div>
 </div>

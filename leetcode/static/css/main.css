@@ -1,0 +1,20 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.resize-h {
+    resize: horizontal;
+    overflow: auto;
+    flex-grow: 1;
+    width: 50%;
+}
+
+.resize-v {
+    resize: vertical;
+    overflow: auto;
+    flex-grow: 1;
+    height: calc(100vh - 150px);
+    max-height: calc(100vh - 150px);
+}

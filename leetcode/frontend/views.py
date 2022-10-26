@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from .models import Code
 from .forms import CodeForm
 
+def home(request):
+    return HttpResponse("HOME")
 
 # Create your views here.
 def add_code(request):
