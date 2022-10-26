@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block main %}
+
+<div class="container col-10 col-md-4 py-3 mt-3 px-4 rounded-4" style="background: #f1f1f1;">
+    <h3 class="text-center">Create Account</h3><br>
+    <form action="{% url 'signup' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="user_name">User Name</label><br>
+            <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Enter user name" required><br>
+        </div>
+        <div class="form-group">
+            <label for="full_name">Name</label><br>
+            <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter full name" required><br>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label><br>
+            <input type="email" class="form-control" id="email" name="email" placeholder="xyz@example.com" required><br>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label><br>
+            <input type="password" class="form-control" id="password" name="password" required>
+            <ul class="mt-2">
+                <li><p class="text-secondary mb-0" style="font-size: 13px;">Your password must contain atleast 8 characters</p></li>
+                <li><p class="text-secondary mb-0" style="font-size: 13px;">Your password must contain atleast 1 uppercase character</p></li>
+                <li><p class="text-secondary mb-0" style="font-size: 13px;">Your password must contain atleast 1 lowercase character</p></li>
+                <li><p class="text-secondary mb-0" style="font-size: 13px;">Your password must contain atleast 1 digit</p></li>
+                <li><p class="text-secondary mb-0" style="font-size: 13px;">Your password must contain atleast 1 special character</p></li>
+            </ul>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-success px-4" value="Submit" id="submit-btn" name="submit-btn">
+        </div>
+    </form>
+</div>    
+
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container">
+    {% load static %}
+    {% include 'assist/ask_question_temp.html' %}
+    <h2>{{ question.title }}</h2>
+    <div class="row text-secondary">
+        <div class="col-3">
+            <small>Asked {{ question.entity.creationDateTime | timesince }} ago</small>
+        </div>
+        <div class="col-2">
+            <p>Views {{ question.views | title }}</p>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-1">
+            <div class="row-sm">
+                <form method="post" id="upvote_form">
+                    {% csrf_token %}
+                    {% if votes_ud == 0 %}
+                    <p class="mb-0 already_upvoted" id="upvote_btn"><i
+                            class="fa-solid fa-thumbs-up fs-5 cursor-pointer text-primary"></i></p>
+                    {% else %}
+                    <p class="mb-0" id="upvote_btn"><i class="fa-regular fa-thumbs-up fs-5 cursor-pointer"></i></p>
+                    {% endif %}
+                </form>
+            </div>
+            <div class="row">
+                <p class="mt-1 mb-1" id="votes_counter">{{ question.votes_count }}</p>
+            </div>
+            <div class="row-sm">
+                <form method="post" id="downvote_form">
+                    {% csrf_token %}
+                    {% if votes_ud == 1 %}
+                    <p class="mb-0 already_downvoted" id="downvote_btn"><i
+                            class="fa-solid fa-thumbs-down fs-5 text-primary cursor-pointer"></i></p>
+                    {% else %}
+                    <p class="mb-0" id="downvote_btn"><i class="fa-regular fa-thumbs-down fs-5 cursor-pointer"></i></p>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        <div class="col-10 ml-3">
+            <div class="row bg-light" style="min-height: 250px;">
+                {{ question.entity.text | safe }}
+            </div>
+            <div class="row">
+                <div class="d-flex">
+                    {% for t in question.getTags %}
+                    <div class="tag-icon">
+                        <p>{{ t.tag }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form action="{% url 'comment' question.id %}" method="POST">
+        {% csrf_token %}
+        <div class="mt-5" style="max-height: 200px;">
+            <textarea name="comment" id="comment" height="100px"></textarea>
+            <div class="d-flex justify-content-end my-3">
+                <input type="submit" class="btn btn-outline-primary" value="Comment">
+            </div>
+        </div>
+    </form>
+
+    <form action="{% url 'answer' question.id %}" method="POST">
+        {% csrf_token %}
+        <div class="mt-5">
+            <textarea name="answer" id="answer" cols="30" rows="5"></textarea>
+            <div class="d-flex justify-content-end my-3">
+                <input type="submit" class="form-control btn btn-outline-primary" value="Answer">
+            </div>
+        </div>
+    </form>
+
+    {% for cmnt in question.getComments %}
+    <div class="row">
+        <h3>Comment</h3>
+        <div class="col-2">
+            <a href="{% url 'profile' cmnt.entity.creator.id %}" class="btn btn-outline-primary btn-sm px-3">
+                {{ cmnt.entity.creator.username }}</a>
+            <small>{{ cmnt.entity.creationDateTime | timesince }} ago</small>
+        </div>
+        <div class="col-10">
+            <p>{{ cmnt.entity.text | safe }}</p>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+
+    {% for ans in question.getAnswers %}
+    <div class="row">
+        <h3>Answer</h3>
+        <div class="col-2">
+            <a href="{% url 'profile' ans.entity.creator.id %}" class="btn btn-outline-primary btn-sm px-3">
+                {{ ans.entity.creator.username }}</a>
+            <small>{{ ans.entity.creationDateTime | timesince }} ago</small>
+        </div>
+        <div class="col-10">
+            <p>{{ ans.entity.text | safe }}</p>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+
+</div>
+<script src="{% static 'js/WYSIWYG.js' %}"></script>
+<script>
+function sub_vote(){
+    var new_val = Number.parseInt($('#votes_counter').val()) - 1;
+    $('#votes_counter').val(new_val);
+}
+
+function add_vote() {
+    var new_val = Number.parseInt($('#votes_counter').val()) + 1
+    $('#votes_counter').val(new_val);
+}
+
+$('#upvote_btn').click(function () {
+    var id = '{{ question.id }}';
+    var vote_type = 'up';
+    var vote_action = 'vote'
+    var csrfmiddlewaretoken = $('#upvote_form input[name=csrfmiddlewaretoken]').val()
+
+    if ($(this).hasClass('already_upvoted')) {
+        vote_action = 'recall-vote'
+        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+            if (response === 'ok') {
+                $('#upvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                $('#upvote_btn').removeClass('already_upvoted');
+                sub_vote()
+            }
+        });
+    } else {
+        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+            if (response === 'ok') {
+                $('#upvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
+                $('#upvote_btn').addClass('already_upvoted');
+                add_vote()
+                if ($("#downvote_btn").hasClass('already_downvoted')) {
+                    $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                    $('#downvote_btn').removeClass('already_downvoted');
+                    add_vote()
+                }
+            }
+        });
+    }
+});
+
+// ------------------------
+$('#downvote_btn').click(function () {
+    var id = '{{ question.id }}';
+    var vote_type = 'down';
+    var csrfmiddlewaretoken = $('#downvote_form input[name=csrfmiddlewaretoken]').val()
+    var vote_action = 'vote'
+
+    if ($(this).hasClass('already_downvoted')) {
+        vote_action = 'recall-vote'
+        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+            if (response === 'ok') {
+                $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                $('#downvote_btn').removeClass('already_downvoted');
+                add_vote()
+            }
+        });
+    } else {
+        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+            if (response === 'ok') {
+                $('#downvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
+                $('#downvote_btn').addClass('already_downvoted');
+                sub_vote()
+                if ($('#upvote_btn').hasClass('already_upvoted')) {
+                    $('#upvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                    $('#upvote_btn').removeClass('already_upvoted');
+                    sub_vote()
+                }
+            }
+        });
+    }
+})
+</script>
+{% endblock %}
