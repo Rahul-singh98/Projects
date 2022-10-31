@@ -77,6 +77,14 @@ class QuestionModel(models.Model):
         return (self.entity.membersWhoUpvoted.all().count()
             - self.entity.membersWhoDownvoted.all().count())
 
+    @property
+    def getComments(self):
+        return self.comments.all()
+
+    @property
+    def getAnswers(self):
+        return self.answer.all()
+
 
 class AnswerModel(models.Model):
     solved_problem = models.BooleanField(default=False)

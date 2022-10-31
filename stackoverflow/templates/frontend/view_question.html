@@ -78,131 +78,112 @@
     </form>
 
     {% for cmnt in question.getComments %}
-    <div class="row">
-        <h3>Comment</h3>
-        <div class="col-2">
-            <a href="{% url 'profile' cmnt.entity.creator.id %}" class="btn btn-outline-primary btn-sm px-3">
-                {{ cmnt.entity.creator.username }}</a>
-            <small>{{ cmnt.entity.creationDateTime | timesince }} ago</small>
-        </div>
-        <div class="col-10">
-            <p>{{ cmnt.entity.text | safe }}</p>
+    <div class="mt-4 rounded-3 p-0">
+        <div class="d-flex">
+            <div class="py-3 px-4 rounded-3 w-100">
+                <p class="fw-bold text-white mb-1 h5">{{ cmnt.entity.text | safe }}</p>
+                <small class="text-secondary"><span class="me-2">{{ cmnt.entity.creationDateTime | timesince }}
+                        ago</span>&bull;</small>
+                <a href="{% url 'profile' cmnt.entity.creator.id %}" class="ms-4">{{ cmnt.entity.creator.username }}</a>
+            </div>
         </div>
     </div>
-    <hr>
     {% endfor %}
+    <hr>
 
 
     {% for ans in question.getAnswers %}
-    <div class="row">
-        <h3>Answer</h3>
-        <div class="col-2">
-            <a href="{% url 'profile' ans.entity.creator.id %}" class="btn btn-outline-primary btn-sm px-3">
-                {{ ans.entity.creator.username }}</a>
-            <small>{{ ans.entity.creationDateTime | timesince }} ago</small>
-        </div>
-        <div class="col-10">
-            <p>{{ ans.entity.text | safe }}</p>
+    <div class="mt-4 rounded-3 p-0">
+        <div class="d-flex">
+            <a href="{% url 'profile' ans.entity.creator.id %}">
+                <img src="{% static 'images/avatar.png' %}" alt="avatar" style="border-radius: 50%;" width="30"
+                    height="30" class="me-3"></a>
+            <div class="py-3 px-4 rounded-3 w-100">
+                <p class="fw-bold text-white mb-1 h5">{{ ans.entity.text | safe }}</p>
+                <small class="text-secondary"><span class="me-2">{{ ans.entity.creationDateTime | timesince }}
+                        ago</span>&bull;</small>
+            </div>
         </div>
     </div>
-    <hr>
-    <!-- <div class="container mt-4 rounded-3 p-5" style="min-height: 400px; background: rgb(29, 29, 29);">
-        <div class="d-flex">
-          <img src="/avatar.webp" alt="avatar" style="border-radius: 50%;" width="50" height="50" class="me-3">
-          <div class="py-3 px-4 rounded-3 w-100 bg-dark" >
-            <p class="fw-bold text-white mb-1 h5">Nerd Show and Tell: Get to Know Trevor Chase, A Real Human™ Technical Support Person</p>
-            <small class="text-secondary"><span class="me-2">September 28, 2022</span> &bull; <span class="ms-2">Font Awesome</span></small>
-            <p class="text-white small mt-2 mb-1" style="letter-spacing: 1px;">
-              My first career was in education. I taught high school business for a couple of years before changing to physical education and coaching. I did that for 3 years while getting my Education Specialist degree in administration. I then became an Assistant Principal and did that for 8 year. So in all, I was in education for 13 years before making the switch to Font Awesome. Being an Assistant Principal was definitely the crappiest job I’ve had. I basically dealt with everyone else’s crap 100% of the time. Thus the career shift. 
-            </p>
-            <a href="#" >Learn More</a> 
-    
-            <p class="text-secondary">Tags</p>
-            <div class="d-flex">
-              <a href="#" class="text-decoration-none bg-gradient text-white small p-1 me-1 px-2 rounded-3">Python</a>
-              <a href="#" class="text-decoration-none bg-gradient text-white small p-1 me-1 px-2 rounded-3">Django</a>
-              <a href="#" class="text-decoration-none bg-gradient text-white small p-1 me-1 px-2 rounded-3">Backend</a>
-            </div>
-          </div>
-        </div>
-      </div> -->
-    {% endfor %}
+</div>
+{% endfor %}
+<hr>
 
 
 </div>
 <script src="{% static 'js/WYSIWYG.js' %}"></script>
 <script>
-function sub_vote(){
-    var new_val = Number.parseInt($('#votes_counter').val()) - 1;
-    $('#votes_counter').val(new_val);
-}
-
-function add_vote() {
-    var new_val = Number.parseInt($('#votes_counter').val()) + 1
-    $('#votes_counter').val(new_val);
-}
-
-$('#upvote_btn').click(function () {
-    var id = '{{ question.id }}';
-    var vote_type = 'up';
-    var vote_action = 'vote'
-    var csrfmiddlewaretoken = $('#upvote_form input[name=csrfmiddlewaretoken]').val()
-
-    if ($(this).hasClass('already_upvoted')) {
-        vote_action = 'recall-vote'
-        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
-            if (response === 'ok') {
-                $('#upvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
-                $('#upvote_btn').removeClass('already_upvoted');
-                sub_vote()
-            }
-        });
-    } else {
-        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
-            if (response === 'ok') {
-                $('#upvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
-                $('#upvote_btn').addClass('already_upvoted');
-                add_vote()
-                if ($("#downvote_btn").hasClass('already_downvoted')) {
-                    $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
-                    $('#downvote_btn').removeClass('already_downvoted');
-                    add_vote()
-                }
-            }
-        });
+    function sub_vote() {
+        var new_val = Number.parseInt($('#votes_counter').val()) - 1;
+        $('#votes_counter').val(new_val);
     }
-});
 
-// ------------------------
-$('#downvote_btn').click(function () {
-    var id = '{{ question.id }}';
-    var vote_type = 'down';
-    var csrfmiddlewaretoken = $('#downvote_form input[name=csrfmiddlewaretoken]').val()
-    var vote_action = 'vote'
+    function add_vote() {
+        var new_val = Number.parseInt($('#votes_counter').val()) + 1
+        $('#votes_counter').val(new_val);
+    }
 
-    if ($(this).hasClass('already_downvoted')) {
-        vote_action = 'recall-vote'
-        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
-            if (response === 'ok') {
-                $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
-                $('#downvote_btn').removeClass('already_downvoted');
-                add_vote()
-            }
-        });
-    } else {
-        $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
-            if (response === 'ok') {
-                $('#downvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
-                $('#downvote_btn').addClass('already_downvoted');
-                sub_vote()
-                if ($('#upvote_btn').hasClass('already_upvoted')) {
+    $('#upvote_btn').click(function () {
+        var id = '{{ question.id }}';
+        var vote_type = 'up';
+        var vote_action = 'vote'
+        var csrfmiddlewaretoken = $('#upvote_form input[name=csrfmiddlewaretoken]').val()
+
+        if ($(this).hasClass('already_upvoted')) {
+            vote_action = 'recall-vote'
+            $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+                if (response === 'ok') {
                     $('#upvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
                     $('#upvote_btn').removeClass('already_upvoted');
                     sub_vote()
                 }
-            }
-        });
-    }
-})
+            });
+        } else {
+            $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+                if (response === 'ok') {
+                    $('#upvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
+                    $('#upvote_btn').addClass('already_upvoted');
+                    add_vote()
+                    if ($("#downvote_btn").hasClass('already_downvoted')) {
+                        $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                        $('#downvote_btn').removeClass('already_downvoted');
+                        add_vote()
+                    }
+                }
+            });
+        }
+    });
+
+    // ------------------------
+    $('#downvote_btn').click(function () {
+        var id = '{{ question.id }}';
+        var vote_type = 'down';
+        var csrfmiddlewaretoken = $('#downvote_form input[name=csrfmiddlewaretoken]').val()
+        var vote_action = 'vote'
+
+        if ($(this).hasClass('already_downvoted')) {
+            vote_action = 'recall-vote'
+            $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+                if (response === 'ok') {
+                    $('#downvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                    $('#downvote_btn').removeClass('already_downvoted');
+                    add_vote()
+                }
+            });
+        } else {
+            $.post('/question/vote', { id: id, type: vote_type, action: vote_action, csrfmiddlewaretoken: csrfmiddlewaretoken }, function (response) {
+                if (response === 'ok') {
+                    $('#downvote_btn').find('i').addClass('text-primary').toggleClass('fa-regular fa-solid');
+                    $('#downvote_btn').addClass('already_downvoted');
+                    sub_vote()
+                    if ($('#upvote_btn').hasClass('already_upvoted')) {
+                        $('#upvote_btn').find('i').removeClass('text-primary').toggleClass('fa-solid fa-regular');
+                        $('#upvote_btn').removeClass('already_upvoted');
+                        sub_vote()
+                    }
+                }
+            });
+        }
+    })
 </script>
 {% endblock %}
