@@ -1,0 +1,7 @@
+.rotate_right {
+    transform: rotate(120deg);
+    position: absolute;
+    top: 45%;
+    height: 100px;
+    width: auto;
+}
