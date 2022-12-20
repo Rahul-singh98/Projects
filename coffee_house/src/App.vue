@@ -1,19 +1,13 @@
 <template>
-  <div>
-    <HomeVue/>
-  </div>
+  <router-view></router-view>
 </template>
 
 <script>
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap"
-import HomeVue from "./components/HomeVue.vue";
 
 export default {
   name: 'App',
-  components: {
-    HomeVue
-  }
 }
 </script>
 
